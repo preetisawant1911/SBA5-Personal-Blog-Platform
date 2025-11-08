@@ -4,6 +4,7 @@ let editingPostId = null;
 const postForm = document.getElementById("postForm");
 const titleInput = document.getElementById("title");
 const contentInput = document.getElementById("content");
+const imageInput = document.getElementById("imageUrl");
 const titleError = document.getElementById("titleError");
 const contentError = document.getElementById("contentError");
 const postsContainer = document.getElementById("postsContainer");
@@ -36,8 +37,13 @@ function renderPosts() {
         <span><strong>Time:</strong> ${new Date(post.timestamp).toLocaleTimeString()}</span>
         ${post.lastEdited ? `<span><strong>Edited:</strong> ${getTimeAgo(post.lastEdited)}</span>` : ""}
       </div>
-      <div class="title">${post.title}</div>
-      <div class="content">${post.content}</div>
+      <div class="content-block">
+        ${post.image ? `<img src="${post.image}" class="image" alt="Blog image" />` : ""}
+        <div>
+          <div class="title">${post.title}</div>
+          <div class="content">${post.content}</div>
+        </div>
+      </div>
       <button onclick="editPost('${post.id}')">Edit</button>
       <button onclick="deletePost('${post.id}')">Delete</button>
     `;
@@ -62,7 +68,7 @@ function validateForm(title, content) {
   }
 
   return isValid;
-}*
+}
 
 function saveToLocalStorage() {
   localStorage.setItem("posts", JSON.stringify(posts));
@@ -73,6 +79,7 @@ postForm.addEventListener("submit", function (e) {
 
   const title = titleInput.value;
   const content = contentInput.value;
+  const imageUrl = imageInput.value.trim();
 
   if (!validateForm(title, content)) return;
 
@@ -80,6 +87,7 @@ postForm.addEventListener("submit", function (e) {
     const post = posts.find(p => p.id === editingPostId);
     post.title = title;
     post.content = content;
+    post.image = imageUrl || null;
     post.lastEdited = new Date().toISOString();
     editingPostId = null;
     submitBtn.textContent = "Add Post";
@@ -88,6 +96,7 @@ postForm.addEventListener("submit", function (e) {
       id: Date.now().toString(),
       title,
       content,
+      image: imageUrl || null,
       timestamp: new Date().toISOString()
     };
     posts.push(newPost);
@@ -96,6 +105,7 @@ postForm.addEventListener("submit", function (e) {
   saveToLocalStorage();
   renderPosts();
   postForm.reset();
+  imageInput.value = "";
 });
 
 function deletePost(id) {
@@ -108,6 +118,7 @@ function editPost(id) {
   const post = posts.find(p => p.id === id);
   titleInput.value = post.title;
   contentInput.value = post.content;
+  imageInput.value = post.image || "";
   editingPostId = id;
   submitBtn.textContent = "Update Post";
 }
