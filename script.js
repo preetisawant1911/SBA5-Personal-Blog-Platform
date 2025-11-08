@@ -62,7 +62,7 @@ function validateForm(title, content) {
   }
 
   return isValid;
-}
+}*
 
 function saveToLocalStorage() {
   localStorage.setItem("posts", JSON.stringify(posts));
